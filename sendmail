@@ -1,0 +1,38 @@
+#!/bin/bash
+##CageFS proxyexec wrapper - ver 16
+
+if [[ $EUID -eq 0 ]]; then
+    echo 'Cannot be run as root'
+    exit 1
+fi
+
+USR=`/usr/bin/whoami`
+TOKEN=`/bin/cat /var/.cagefs/.cagefs.token`
+# It's user's tmp directory and write to it is secure procedure
+# because this script is running only under usual user
+PIDFILE="/tmp/.cagefs.proxy.$$"
+USER_INTERRUPT=13
+CWD=`pwd`
+
+ctrl_c_handler() {
+    if [[ -f "$PIDFILE" ]]; then
+        pid=`/bin/cat $PIDFILE`
+        /bin/rm -f $PIDFILE > /dev/null 2>&1
+        /bin/kill -s SIGINT "$pid" > /dev/null 2>&1
+    fi
+    exit $USER_INTERRUPT
+}
+
+if [[ -e /var/.cagefs/origin ]]; then
+    ORIGIN=`/bin/cat /var/.cagefs/origin`
+    REMOTE="/usr/bin/ssh -F /etc/ssh/cagefs-rexec_config $USR@$ORIGIN"
+    $REMOTE CAGEFS_TOKEN="$TOKEN" /usr/sbin/proxyexec -c cagefs.sock "$USR" "$CWD" SENDMAIL $$ "$@"
+    RETVAL=$?
+else
+    trap 'ctrl_c_handler' 2
+    CAGEFS_TOKEN="$TOKEN" /usr/sbin/proxyexec -c cagefs.sock "$USR" "$CWD" SENDMAIL $$ "$@"
+    RETVAL=$?
+    /bin/rm -f $PIDFILE > /dev/null 2>&1
+fi
+
+exit $RETVAL
