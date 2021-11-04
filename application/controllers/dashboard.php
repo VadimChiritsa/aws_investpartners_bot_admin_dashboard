@@ -23,7 +23,7 @@ class Dashboard extends CI_Controller {
         $data['admins'] = $this->db->query("SELECT * FROM admins")->result();
         $data['ads'] = $this->db->query("SELECT * FROM ads WHERE date >= '".strtotime(date('d.m.Y H:i:s'))."'")->result();
 
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         $i6 = "SELECT * FROM rules WHERE id = '1'";
         mysqli_set_charset($mysqli, "utf8mb4");
         $result_r = $mysqli->query($i6);
@@ -82,14 +82,29 @@ class Dashboard extends CI_Controller {
     
     public function save_user($id=0)
     {
+        $data['old_users'] = $this->db->query("SELECT * FROM users WHERE telegram_id = '".$id."'")->result();
+        $previous_status = 1;
+        foreach($data['old_users'] as $user){
+            $previous_status = $user->status;
+        }
+        
         $this->db->where('telegram_id', $id);
         $this->db->update('users', $_POST);
+
+        $data['users'] = $this->db->query("SELECT * FROM users WHERE telegram_id = '".$id."'")->result();
+
+        foreach($data['users'] as $user){
+            if($user->status == 1 && $previous_status == 0) {
+                $this->sendMessage("$id", 'Ваш аккаунт верифицирован.', "2077508530:AAGeAQqLroyqwDCrmaqQrAYTrVmCIHVQOgY");
+            }
+        }
+       
         redirect('/index.php/dashboard/');
     }
     
     public function save_rules($id=0)
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         $i6 = " UPDATE rules SET rules = '" . implode(" ", $_POST) . "' WHERE id = 1;";
         mysqli_set_charset($mysqli, "utf8mb4");
         $mysqli->query($i6);
@@ -101,7 +116,7 @@ class Dashboard extends CI_Controller {
     {
         $message_body = trim(implode(" ", $_POST));
         if ($message_body != "") {
-            $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+            $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
             $query_telegram_ids = "SELECT telegram_id FROM users WHERE status = '1'";
             $all_telegram_ids = $mysqli->query($query_telegram_ids);
     
@@ -147,5 +162,5 @@ class Dashboard extends CI_Controller {
             $result = curl_exec($ch);
             curl_close($ch);
             return $result;
-        }
+    }
 }

@@ -1,6 +1,10 @@
 
 <?php
 
+require './phpmailer/PHPMailer.php';
+require './phpmailer/SMTP.php';
+require './phpmailer/Exception.php';
+
 class Bot
 {
     // Токен бота
@@ -32,7 +36,7 @@ class Bot
     private function router()
     {
 
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
 
         mysqli_set_charset($mysqli, "utf8");
 
@@ -193,7 +197,7 @@ class Bot
                             $mysqli->query($i6);
 
                             if ($language == "rus") {
-                                $message = "Отлично, регистрация закончена. Теперь Ваш аккаунт будет верефицирован нашими администраторами. После верификации Вы получите уведомление уведомление на e-mail.";
+                                $message = "Отлично, регистрация закончена. Теперь Ваш аккаунт будет верефицирован нашими администраторами. После верификации Вы получите уведомление в боте.";
                                 $buttons = json_encode([
                                     "keyboard" => [
                                         [["text" => "Вход",]]
@@ -233,7 +237,6 @@ class Bot
 
                                 $i6 = "INSERT INTO ads (telegram_id, date, amount, status, type, username) VALUES ('" . $userId . "', '" . strtotime($tomorrow) . "', '" . $this->data['message']['text'] . "', 0, 'buy', '" . $username . "');";
                                 $mysqli->query($i6);
-
 
                                 $i6 = "UPDATE users SET last_action = 'i_buy_add_rates' WHERE telegram_id = '" . $userId . "'";
                                 $mysqli->query($i6);
@@ -825,7 +828,7 @@ class Bot
      */
     private function start()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
 
         mysqli_set_charset($mysqli, "utf8");
 
@@ -914,7 +917,7 @@ class Bot
     private function actionInlineButton($callback_data)
     {
 
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
 
         mysqli_set_charset($mysqli, "utf8");
 
@@ -1052,7 +1055,7 @@ class Bot
             $userId = $this->data['callback_query']['from']['id'];
         }
 
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
 
         mysqli_set_charset($mysqli, "utf8");
 
@@ -1112,7 +1115,7 @@ class Bot
 
     private function registration()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
 
         $this->data = json_decode(file_get_contents('php://input'), true);
@@ -1157,7 +1160,7 @@ class Bot
 
     private function mainmenu()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1219,7 +1222,7 @@ class Bot
 
     private function buy_sell()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1311,7 +1314,7 @@ class Bot
     private function iagreerules()
     {
 
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1331,7 +1334,7 @@ class Bot
 
     private function add_ads()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1392,7 +1395,7 @@ class Bot
 
     private function i_buy()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1433,7 +1436,7 @@ class Bot
 
     private function i_sell()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1473,7 +1476,7 @@ class Bot
 
     private function buy($step)
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1494,7 +1497,7 @@ class Bot
             while ($row = $result2->fetch_assoc()) {
 
                 if ($row['status'] == 1 && $row['enter_key'] != "") {
-                    $buy = "SELECT * FROM ads WHERE date >= '" . strtotime(date('d.m.Y H:i:s')) . "' and type='buy' LIMIT  " . $st[0] . "," . $st[1] . "";
+                    $buy = "SELECT * FROM ads WHERE status='1' and date >= '" . strtotime(date('d.m.Y H:i:s')) . "' and type='buy' LIMIT  " . $st[0] . "," . $st[1] . "";
                     $result2z = $mysqli->query($buy);
                     if ($result2z->num_rows > 0) {
 
@@ -1580,7 +1583,7 @@ class Bot
 
     private function sell($step)
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1606,9 +1609,7 @@ class Bot
 
                     ////
 
-                    $buy = "SELECT * FROM ads WHERE date >= '" . strtotime(date('d.m.Y H:i:s')) . "' and type='sell' LIMIT " . $st[0] . "," . $st[1] . "";
-
-
+                    $buy = "SELECT * FROM ads WHERE status='1' and date >= '" . strtotime(date('d.m.Y H:i:s')) . "' and type='sell' LIMIT " . $st[0] . "," . $st[1] . "";
 
                     $result2z = $mysqli->query($buy);
                     if ($result2z->num_rows > 0) {
@@ -1693,7 +1694,7 @@ class Bot
 
     private function my_ads()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1748,7 +1749,7 @@ class Bot
 
                     ////
 
-                    $addressz = "SELECT * FROM ads WHERE telegram_id = '" . $userId . "' and date >= '" . strtotime(date('d.m.Y H:i:s')) . "'";
+                    $addressz = "SELECT * FROM ads WHERE status='1' and telegram_id = '" . $userId . "' and date >= '" . strtotime(date('d.m.Y H:i:s')) . "'";
                     $result2z = $mysqli->query($addressz);
                     if ($result2z->num_rows > 0) {
 
@@ -1818,7 +1819,7 @@ class Bot
 
     private function edit_profile()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1859,7 +1860,7 @@ class Bot
 
     private function rules()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1916,7 +1917,7 @@ class Bot
 
     private function exit()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -1974,7 +1975,7 @@ class Bot
 
     private function prof()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -2041,7 +2042,7 @@ class Bot
 
     private function search()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -2073,7 +2074,7 @@ class Bot
 
     private function login()
     {
-        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', '!y12aubXO7;f', 'telegram_bot_invest_partners', '3306');
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         mysqli_set_charset($mysqli, "utf8");
         $this->data = json_decode(file_get_contents('php://input'), true);
         if (array_key_exists("message", $this->data)) {
@@ -2101,7 +2102,7 @@ class Bot
 
 
                     if ($row['language'] == "rus") {
-                        $message = 'Введите ключ доступа, который только что был выслан Вам на e-mail.';
+                        $message = 'Введите ключ доступа, который только что был выслан Вам на e-mail. Просим обратить внимание, что письмо приходит в течении 5 минут.';
                         $subject = 'Ключ авторизации';
                         $email_message = 'Ваш ключ авторизации ' . $key . '';
                     }
@@ -2120,13 +2121,15 @@ class Bot
 
                     $m = "" . $email_message . "";
                     $m = wordwrap($m, 70, "\r\n");
-                    mail('' . $row['email_amir'] . '', '' . $subject . '', $m);
+                    // mail('' . $row['email_amir'] . '', '' . $subject . '', $m);
+                    
+                    $this->sendEmail($row['email_amir'], $key);
                 }
 
                 if ($row['status'] == 0) {
 
                     if ($row['language'] == "rus") {
-                        $message = 'Ваш аккаунт еще не верифицирован администрацией. Ожидайте уведомления на e-mail.';
+                        $message = 'Ваш аккаунт еще не верифицирован администрацией. Ожидайте уведомления в боте.';
                     }
 
                     if ($row['language'] == "eng") {
@@ -2162,6 +2165,37 @@ class Bot
         $r = json_decode(curl_exec($ch), true);
         curl_close($ch);
         return $r;
+    }
+
+    private function sendEmail($user_email, $code)
+    {
+        $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+
+        try {
+            $mail->isSMTP();  
+            $mail->CharSet = "UTF-8";
+            $mail->SMTPAuth   = true;
+        
+            // Настройки вашей почты
+            $mail->Host       = 'email-smtp.eu-central-1.amazonaws.com'; // SMTP сервера вашей почты
+            $mail->Username   = 'AKIAW2B7LDW45IIRPKSH'; // Логин на почте
+            $mail->Password   = 'BGMH8QpdDT67znUBHTJ/b2uVg32alemTL8DAqjtYnumy'; // Пароль на почте
+            $mail->Port       = 2587;
+            $mail->SMTPSecure = 'tls';
+            $mail->setFrom('info@info.investpartners.link', 'InvestPartners_Bot'); // Адрес самой почты и имя отправителя
+        
+            // Получатель письма
+            $mail->addAddress($user_email);  
+          
+            $mail->Subject = 'Ключ авторизации';
+            $mail->Body = $code;    
+
+            // Проверяем отравленность сообщения
+            $mail->send();
+        } catch (Exception $e) {
+            echo "Email not sent. {$mail->ErrorInfo}", PHP_EOL; //Catch errors from Amazon SES.
+        }
+
     }
 }
 

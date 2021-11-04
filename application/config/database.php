@@ -50,7 +50,7 @@ $active_record = TRUE;
 
 $db['default']['hostname'] = 'localhost';
 $db['default']['username'] = 'telegram_investpartners2021';
-$db['default']['password'] = 'eS8kZvas(N)g';
+$db['default']['password'] = 'investpartners2021';
 $db['default']['database'] = 'telegram_bot_invest_partners';
 $db['default']['dbdriver'] = 'mysqli';
 $db['default']['dbprefix'] = '';
