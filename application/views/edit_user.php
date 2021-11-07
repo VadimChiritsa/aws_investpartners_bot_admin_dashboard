@@ -1,6 +1,4 @@
 <?php $this->load->view('header');?>
-<? $session_id = @$this->session->userdata('id_user');
-        if(!$session_id) redirect('/');?>
 
 <div id="page-wrapper" style="min-height: 251px;">
 <div class="container-fluid">

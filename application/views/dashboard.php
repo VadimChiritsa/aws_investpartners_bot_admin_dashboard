@@ -70,8 +70,6 @@
 </div>
 <!-- /.panel -->
 
-<? $session_id = @$this->session->userdata('id_user');
-        if(!$session_id) redirect('/');?>
 
 <div class="panel panel-default">
 <div class="panel-heading">
