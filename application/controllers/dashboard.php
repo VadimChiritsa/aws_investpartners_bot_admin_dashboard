@@ -1,8 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
+session_start();
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
+
 
 class Dashboard extends CI_Controller {
 
@@ -12,16 +13,101 @@ class Dashboard extends CI_Controller {
         
         
     }
+	
+	
+	
     
 	
 	public function index()
 	{
+		$sort='';
+		$sort_order='';
+		if(isset($_SESSION['sort_order'])){
+		$sort_order=$_SESSION['sort_order'];	
+		}
+		
+if(isset($_SESSION['sort_user'])){
+	$sort=' ORDER BY '.$_SESSION['sort_user'];
+}
         
         $data['buy'] = $this->db->query("SELECT * FROM ads WHERE type = 'buy' and date >= '".strtotime(date('d.m.Y H:i:s'))."'")->result();
         $data['sell'] = $this->db->query("SELECT * FROM ads WHERE type = 'buy' and date >= '".strtotime(date('d.m.Y H:i:s'))."'")->result();
-        $data['users'] = $this->db->query("SELECT * FROM users")->result();
+		
+		//// PAGINATION USERS
+		if(!isset($_SESSION['cur_page'])){
+						  $cur_page=1;
+						  $_SESSION['cur_page']=1;
+					  }
+					  $url_q=urlencode($_SERVER['QUERY_STRING']);
+		if(!isset($_SESSION['user_limit'])){
+			$limit=10;
+		}else{
+			$limit=$_SESSION['user_limit'];
+		}
+					  //$limit=39;
+					  $cur_page=$_SESSION['cur_page'];
+		
+		$count_pages =$this->db->query("SELECT * FROM users")->num_rows;
+		$total_pages = intval(($count_pages - 1) / $limit) + 1;
+		
+				$_SESSION['total_pages']=$total_pages;	  
+					  if(empty($cur_page) or $cur_page < 0) $cur_page = 1;
+                      if($cur_page > $total_pages) $cur_page = $total_pages;
+					  $start_page = $cur_page * $limit - $limit;
+		
+		/////
+		
+		
+        $data['users'] = $this->db->query("SELECT * FROM users $sort $sort_order LIMIT $start_page, $limit")->result();
+		
+		
+		
+		
+		
+		
+		
         $data['admins'] = $this->db->query("SELECT * FROM admins")->result();
-        $data['ads'] = $this->db->query("SELECT * FROM ads WHERE date >= '".strtotime(date('d.m.Y H:i:s'))."'")->result();
+		
+		$sort_ads='';
+		$sort_order_ads='';
+		if(isset($_SESSION['sort_order_ads'])){
+		$sort_order_ads=$_SESSION['sort_order_ads'];	
+		}else{
+			$sort_order_ads='';
+		}
+		
+if(isset($_SESSION['sort_ads'])){
+	$sort_ads=' ORDER BY '.$_SESSION['sort_ads'];
+}else{
+	$sort_ads='';
+}
+		
+		//// PAGINATION ADS
+		if(!isset($_SESSION['cur_page2'])){
+						  $cur_page_ads=1;
+						  $_SESSION['cur_page2']=1;
+					  }
+					 
+		if(!isset($_SESSION['ads_limit'])){
+			$limit_ads=10;
+		}else{
+			$limit_ads=$_SESSION['ads_limit'];
+		}
+					  //$limit=39;
+					  $cur_page=$_SESSION['cur_page2'];
+		
+		$count_pages_ads =$this->db->query("SELECT * FROM ads")->num_rows;
+		$total_pages_ads = intval(($count_pages_ads - 1) / $limit_ads) + 1;
+		
+				$_SESSION['total_pages2']=$total_pages_ads;	  
+					  if(empty($cur_page_ads) or $cur_page_ads < 0) $cur_page_ads = 1;
+                      if($cur_page_ads > $total_pages_ads) $cur_page_ads = $total_pages_ads;
+					  $start_page_ads = $cur_page_ads * $limit_ads - $limit_ads;
+		
+		/////
+		
+		
+        $data['ads'] = $this->db->query("SELECT * FROM ads WHERE date >= '".strtotime(date('d.m.Y H:i:s'))."' $sort_ads $sort_order_ads  LIMIT $start_page_ads, $limit_ads")->result();
 
         $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
         $i6 = "SELECT * FROM rules WHERE id = '1'";
