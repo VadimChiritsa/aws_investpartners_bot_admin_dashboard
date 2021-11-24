@@ -139,7 +139,7 @@ if(isset($_SESSION['sort_ads'])){
     public function delete_user($id=0)
     {
         
-        $data = array('status' => 99);
+        $data = array('status' => 99, 'data_banned'=>time());
         
        // $this->db->delete('users', array('telegram_id' => $id));
         $this->db->where('telegram_id', $id);

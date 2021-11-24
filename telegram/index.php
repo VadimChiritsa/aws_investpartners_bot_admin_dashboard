@@ -59,7 +59,7 @@ class Bot
 
                 $users = "SELECT * FROM users WHERE telegram_id = '" . $userId . "'";
                 $result2 = $mysqli->query($users);
-                if ($result2->num_rows > 0) {
+                if ($result2->num_rows > 0 && $this->data['message']['text'] != 'Вход') {
 
                     while ($row = $result2->fetch_assoc()) {
 
@@ -650,7 +650,7 @@ class Bot
                             if ($row['status'] == 0) {
 
                                 if ($row['language'] == "rus") {
-                                    $message = 'Ваш аккаунт еще не верифицирован администрацией. Ожидайте уведомления.';
+                                    $message = 'Ваш аккаунт еще не верифицирован администрацией. Ожидайте уведомления в боте.';
                                 }
 
                                 if ($row['language'] == "eng") {
@@ -710,7 +710,7 @@ class Bot
                                 } else {
 
                                     if ($language == "rus") {
-                                        $message = "Введенный Вами ключ доступа является недействительным. Введите актуальный ключ доступа:";
+                                        $message = "Введенный Вами ключ доступа является недействительным. Введите ключ доступа, который только что был выслан Вам на e-mail. Просим обратить внимание, что письмо приходит в течении 5 минут.";
                                     }
                                     if ($language == "eng") {
                                         $message = "The access key you entered is invalid. Enter the current access key:";
@@ -775,9 +775,9 @@ class Bot
                 } elseif ($this->data['message']['text'] == "Exit") {
                     $this->exit();
                 } elseif ($this->data['message']['text'] == "Редактировать профиль") {
-                    $this->edit_profile();
+                    $this->sure_edit_profile();
                 } elseif ($this->data['message']['text'] == "Edit profile (new verification required)") {
-                    $this->edit_profile();
+                    $this->sure_edit_profile();
                 } elseif ($this->data['message']['text'] == "Купить") {
                     $this->sell("0,10");
                 } elseif ($this->data['message']['text'] == "Buy") {
@@ -942,7 +942,16 @@ class Bot
 
         $commands_params = explode("-", $params['1']);
 
+        if ($commands_params['0'] == "sureEdit") {
 
+            if ($commands_params['1'] == "yes") {
+                $this->edit_profile();
+            }
+
+            if ($commands_params['1'] == "no") {
+                $this->prof();
+            }
+        }
 
         if ($commands_params['0'] == "paysell") {
 
@@ -1126,28 +1135,72 @@ class Bot
             $userId = $this->data['callback_query']['from']['id'];
         }
 
-        $i6 = " UPDATE users SET last_action = 'enter_email_amir' WHERE telegram_id = '" . $userId . "';";
-        $mysqli->query($i6);
-
-        $user = "SELECT * FROM users WHERE telegram_id = '" . $userId . "'";
-        $result2 = $mysqli->query($user);
+        $users = "SELECT * FROM users WHERE telegram_id = '" . $userId . "' and WHERE status='1'";
+        $result2 = $mysqli->query($users);
         if ($result2->num_rows > 0) {
 
             while ($row = $result2->fetch_assoc()) {
 
-
                 if ($row['language'] == "rus") {
-                    $message = 'Введите email, на который зарегистрирован ваш личный кабинет в Amir Capital Group.';
+                    $buttons = json_encode([
+                        "keyboard" => [
+                            [["text" => "Вход",]]
+                        ],
+                        'one_time_keyboard' => false,
+                        'resize_keyboard' => true,
+                        'selective' => true,
+                    ], true);
+
+                    $this->botApiQuery("sendMessage", [
+                        "chat_id" => $userId,
+                        "text" => "Вы уже зарегистрированы. Войдите в систему под своими данными.",
+                        "reply_markup" => $buttons
+                    ]);
                 }
+
 
                 if ($row['language'] == "eng") {
-                    $message = 'Enter your email in amir';
-                }
+                    $buttons = json_encode([
+                        "keyboard" => [
+                            [["text" => "Enter",]]
+                        ],
+                        'one_time_keyboard' => false,
+                        'resize_keyboard' => true,
+                        'selective' => true,
+                    ], true);
 
-                $this->botApiQuery("sendMessage", [
-                    "chat_id" => $userId,
-                    "text" => "" . $message . "",
-                ]);
+                    $this->botApiQuery("sendMessage", [
+                        "chat_id" => $userId,
+                        "text" => "Log in with your data.",
+                        "reply_markup" => $buttons
+                    ]);
+                }
+            } //while
+
+        } else {
+            $i6 = " UPDATE users SET last_action = 'enter_email_amir' WHERE telegram_id = '" . $userId . "';";
+            $mysqli->query($i6);
+    
+            $user = "SELECT * FROM users WHERE telegram_id = '" . $userId . "'";
+            $result2 = $mysqli->query($user);
+            if ($result2->num_rows > 0) {
+    
+                while ($row = $result2->fetch_assoc()) {
+    
+    
+                    if ($row['language'] == "rus") {
+                        $message = 'Введите email, на который зарегистрирован ваш личный кабинет в Amir Capital Group.';
+                    }
+    
+                    if ($row['language'] == "eng") {
+                        $message = 'Enter your email in amir';
+                    }
+    
+                    $this->botApiQuery("sendMessage", [
+                        "chat_id" => $userId,
+                        "text" => "" . $message . "",
+                    ]);
+                }
             }
         }
     }
@@ -1817,6 +1870,57 @@ class Bot
     } //function
 
 
+    private function sure_edit_profile(){
+
+        $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
+        mysqli_set_charset($mysqli, "utf8");
+        $this->data = json_decode(file_get_contents('php://input'), true);
+        if (array_key_exists("message", $this->data)) {
+            $userId = $this->data['message']['from']['id'];
+        }
+        if (array_key_exists("callback_query", $this->data)) {
+            $userId = $this->data['callback_query']['from']['id'];
+        }
+
+        $i6 = "UPDATE users SET last_action = 'sure_edit_profile' WHERE telegram_id = '" . $userId . "'";
+        $mysqli->query($i6);
+
+        $user = "SELECT * FROM users WHERE telegram_id = '" . $userId . "'";
+        $result2 = $mysqli->query($user);
+        if ($result2->num_rows > 0) {
+            while ($row = $result2->fetch_assoc()) {
+                if ($row['language'] == "rus") {
+                    $message = "Потребуется новая верификация. Вы уверены, что хотите продолжить?";
+                }
+                if ($row['language'] == "eng") {
+                    $message = "Will need new verification. Do you want to continue?";
+                }
+
+                $buttons = json_encode([
+                    'inline_keyboard' => [
+                        [
+                            [
+                                "text" => "Да",
+                                "callback_data" => "actionInlineButton_sureEdit-yes"
+                            ],
+                            [
+                                "text" => "Нет",
+                                "callback_data" => "actionInlineButton_sureEdit-no"
+                            ]
+                        ]
+                    ],
+                ], true);
+        
+                $this->botApiQuery("sendMessage", [
+                    "chat_id" => $userId,
+                    "text" => "" . $message . "",
+                    "reply_markup" => $buttons
+                ]);
+            }
+        }
+    }
+
+
     private function edit_profile()
     {
         $mysqli = new mysqli('localhost', 'telegram_investpartners2021', 'investpartners2021', 'telegram_bot_invest_partners', '3306');
@@ -1828,9 +1932,6 @@ class Bot
         if (array_key_exists("callback_query", $this->data)) {
             $userId = $this->data['callback_query']['from']['id'];
         }
-
-
-
 
         $user = "SELECT * FROM users WHERE telegram_id = '" . $userId . "'";
         $result2 = $mysqli->query($user);
@@ -1880,18 +1981,6 @@ class Bot
             while ($row = $result2->fetch_assoc()) {
 
                 if ($row['status'] == 1 && $row['enter_key'] != "") {
-
-                    /*
-                        if($row['language']=="rus")
-                        {
-                            $message = "Текст правил бла бла бла";
-                        }
-                        if($row['language']=="eng")
-                        {
-                            $message = "rules bla bla bla";
-                            
-                        }
-                        */
 
                     mysqli_set_charset($mysqli, "utf8mb4");
                     $rules = "SELECT * FROM rules WHERE id = '1'";
